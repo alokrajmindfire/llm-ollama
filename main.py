@@ -1,34 +1,16 @@
-from langchain.chat_models import ChatOpenAI
-from langchain.prompts import PromptTemplate
-from langchain.chains import LLMChain
+from langchain.agents import create_agent
 
-# 1️⃣ Define a template (the instruction)
-template = "Write a 3-line poem about {topic}."
+def get_weather(city: str) -> str:
+    """Get weather for a given city."""
+    return f"It's always sunny in {city}!"
 
-# 2️⃣ Build a prompt
-prompt = PromptTemplate.from_template(template)
+agent = create_agent(
+    model="anthropic:claude-sonnet-4-5",
+    tools=[get_weather],
+    system_prompt="You are a helpful assistant",
+)
 
-# 3️⃣ Initialize the model
-llm = ChatOpenAI(model_name="gpt-3.5-turbo")
-
-# 4️⃣ Connect them into a Chain
-chain = LLMChain(llm=llm, prompt=prompt)
-
-# 5️⃣ Run the Chain
-result = chain.run(topic="the moon")
-print(result)
-
-
-
-
-from langchain.chains import ConversationChain
-from langchain.chat_models import ChatOpenAI
-from langchain.memory import ConversationBufferMemory
-
-llm = ChatOpenAI(model_name="gpt-3.5-turbo")
-memory = ConversationBufferMemory()
-
-chat = ConversationChain(llm=llm, memory=memory)
-
-print(chat.run("Hi, my name is Alok."))
-print(chat.run("What’s my name?"))
+# Run the agent
+agent.invoke(
+    {"messages": [{"role": "user", "content": "what is the weather in sf"}]}
+)
